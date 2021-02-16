@@ -1,0 +1,118 @@
+<!-- Main Footer -->
+<footer class="main-footer">
+    <!-- To the right -->
+    <div class="pull-right hidden-xs">
+        V 1.0
+    </div>
+    <!-- Default to the left -->
+    <strong>Copyright &copy; 2020 <a href="#">MyLudo</a>.</strong> All rights reserved.
+</footer>
+<div class="control-sidebar-bg"></div>
+</div>
+<!-- ./wrapper -->
+
+<!-- REQUIRED JS SCRIPTS -->
+
+<!-- jQuery 3 -->
+<script src="<%= host %>/admin-assets/bower_components/jquery/dist/jquery.min.js"></script>
+<!-- Bootstrap 3.3.7 -->
+<script src="<%= host %>/admin-assets/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<!-- DataTables -->
+<script src="<%= host %>/admin-assets/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+<script src="<%= host %>/admin-assets/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.6/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.html5.min.js"></script>
+<!-- AdminLTE App -->
+<script src="<%= host %>/admin-assets/dist/js/adminlte.min.js"></script>
+<!-- ChartJS -->
+<script src="<%= host %>/main.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#example1').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                'excelHtml5',
+                'csvHtml5',
+                'pdfHtml5',
+            ]
+        });
+
+        // Password Reset 
+        $('#frmresetPassword').on('submit', function (e) {
+            $("#btnReset").hide();
+            $("#loaderReset").show();
+            e.preventDefault();
+            var formdata = $('#frmresetPassword').serializeArray();
+            swal({
+                text: 'Please enter your PASSWORD to proceed',
+                content: {
+                    element: "input",
+                    attributes: {
+                        placeholder: "Type your password",
+                        type: "password",
+                    },
+                },
+                button: {
+                    text: "Proceed",
+                    closeModal: false
+                },
+            }).then(password => {
+                if (!password) {
+                    $("#btnReset").show();
+                    $("#loaderReset").hide();
+                };
+
+                formdata.push({
+                    name: 'password',
+                    value: password
+                });
+                $.ajax({
+                    method: 'post',
+                    url: '/admin/reset-pass',
+                    data: formdata,
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.status == 1) {
+                            console.log(response);
+                            swal({
+                                icon: 'success',
+                                title: response.message
+                            }).then(function () {
+                                window.location.reload();
+                            });
+                            $("#btnReset").show();
+                            $("#loaderReset").hide();
+                        } else {
+                            console.log(response);
+                            swal({
+                                icon: 'error',
+                                title: response.message,
+                            }).then(function () {
+                                window.location.reload();
+                            });
+                            $("#btnReset").show();
+                            $("#loaderReset").hide();
+                        }
+                    }
+                });
+
+            }).catch(err => {
+                if (err) {
+                    swal("Oh noes!", "The request failed!", "error");
+                } else {
+                    swal.stopLoading();
+                    swal.close();
+                }
+            });
+
+        });
+
+    });
+</script>
+</body>
+
+</html>

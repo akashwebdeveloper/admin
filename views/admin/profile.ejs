@@ -1,0 +1,191 @@
+<%- include header %>
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            <%= title %>
+        </h1>
+    </section>
+
+    <!-- Main content -->
+    <section class="content container-fluid">
+        <div class="row">
+            <!-- Profile Update -->
+            <div class="col-md-6">
+                <div class="box">
+                    <!-- /.box-header -->
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Profile Update</h3>
+                    </div>
+                    <div class="box-body">
+                        <form method="POST" name="adminProfile" id="adminProfile">
+                            <div class="form-group">
+                                <label for="name">Name:</label>
+                                <input type="text" class="form-control" id="name" placeholder="Enter Name"
+                                    name="name" value="<%= admin.name %>" data-validation="required">
+                            </div>
+                            <div class="form-group">
+                                <label for="pwd">Email:</label>
+                                <input type="text" class="form-control" id="email" placeholder="Enter Email"
+                                    name="email" value="<%= admin.email %>" data-validation="required email">
+                            </div>
+                            <h4 id="loaderbtn" style="display: none"><i class="fa fa-spinner fa-spin" style="color: #000"></i> Loading</h4>
+                            <button type="submit" class="btn btn-success" id="profileBtn">Update</button>
+                        </form>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+            </div>
+
+            <!-- Password Update  -->
+            <div class="col-md-6">
+                <div class="box">
+                    <!-- /.box-header -->
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Change Password</h3>
+                    </div>
+                    <div class="box-body">
+                        <form method="POST" name="adminPassword" id="adminPassword">
+                            <div class="form-group">
+                                <label for="opass">Old Password:</label>
+                                <input type="password" class="form-control" id="opass" placeholder="Enter Password"
+                                    name="opass" data-validation="required">
+                            </div>
+                            <div class="form-group">
+                                <label for="npass">New Password:</label>
+                                <input type="password" class="form-control" id="npass" placeholder="Enter New Password"
+                                name="pass_confirmation" data-validation="required">
+                            </div>
+                            <div class="form-group">
+                                <label for="cpass">Confirm Password:</label>
+                                <input type="password" class="form-control" id="cpass" placeholder="Confirm Password"
+                                    name="pass" data-validation="confirmation required">
+                            </div>
+                            <h4 id="passloaderbtn" style="display: none"><i class="fa fa-spinner fa-spin" style="color: #000"></i> Loading</h4>
+                            <button type="submit" class="btn btn-success" id="passBtn">Update</button>
+                        </form>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
+<%- include footer %>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/jquery.form-validator.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $.validate({
+            modules: 'html5, security'
+        });
+
+        $('#adminProfile').on('submit', function (e) {
+            $("#profileBtn").hide();
+            $("#loaderbtn").show();
+            e.preventDefault();
+            var formdata = $("#adminProfile").serializeArray();
+            swal({
+                text: 'Please enter your PASSWORD to proceed',
+                content: {
+                    element: "input",
+                    attributes: {
+                    placeholder: "Type your password",
+                    type: "password",
+                    },
+                },
+                button: {
+                    text: "Proceed",
+                    closeModal: false
+                },
+            }).then(password => {
+                if (!password) {
+                    $("#profileBtn").show();
+                    $("#loaderbtn").hide();        
+                };
+
+                formdata.push(
+                    {name: 'password', value: password}
+                );
+
+                $.ajax({
+                    method: 'post',
+                    url: '/admin/genprofile',
+                    data: formdata,
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.status == 1) {
+                            console.log(response);
+                            swal({
+                                icon: 'success',
+                                title: response.message
+                            }).then(function () {
+                                window.location.reload();
+                            });
+                            $("#btnRemoveCoin").show();
+                            $("#loaderbtn3").hide();
+                        } else {
+                            console.log(response);
+                            swal({
+                                icon: 'error',
+                                title: response.message,
+                            }).then(function () {
+                                window.location.reload();
+                            });
+                            $("#btnRemoveCoin").show();
+                            $("#loaderbtn3").hide();
+                        }
+                    }
+                });
+            }).catch(err => {
+                if (err) {
+                    swal("Oh noes!", "The request failed!", "error");
+                } else {
+                    swal.stopLoading();
+                    swal.close();
+                }
+            });            
+
+        });
+
+        $('#adminPassword').on('submit', function (e) {
+            $("#passBtn").hide();
+            $("#passloaderbtn").show();
+            e.preventDefault();
+            var formdata = new FormData(this);
+            $.ajax({
+                method: 'post',
+                url: '/admin/adminpass',
+                data: formdata,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                        if (response.status == 1) {
+                            console.log(response);
+                            swal({
+                                icon: 'success',
+                                title: response.message
+                            }).then(function () {
+                                window.location.reload();
+                            });
+                            $("#btnRemoveCoin").show();
+                            $("#loaderbtn3").hide();
+                        } else {
+                            console.log(response);
+                            swal({
+                                icon: 'error',
+                                title: response.message,
+                            }).then(function () {
+                                window.location.reload();
+                            });
+                            $("#btnRemoveCoin").show();
+                            $("#loaderbtn3").hide();
+                        }
+                    }
+            });
+        });
+    });
+</script>

@@ -1,0 +1,288 @@
+<%- include header %>
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            <%= title %>
+        </h1>
+    </section>
+
+    <!-- Main content -->
+    <section class="content container-fluid">
+        <div class="row">
+            <div class="col-md-12 text-right">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addSubAdmin">Create New Package</button>
+            </div>
+            <div class="col-md-12" style="margin-top: 10px;">
+                <div class="box">
+                    <!-- /.box-header -->
+                    <div class="box-body table-responsive">
+                        <table id="packageTab" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Boot Amount</th>
+                                    <th>Created Date</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% for (d of data.list) {%>
+                                <tr class="gradeX">
+                                    <td><%= d.boot_amount %></td>
+                                    <td class="time_formateDateandTime2"><%= d.created_at%></td>
+                                    <td>
+                                        <% if ( d.is_active ) { %>
+                                        <small class="label bg-green">Active</small>
+                                        <% } else { %>
+                                        <small class="label bg-red">Inactive</small>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <% if ( d.is_active ) { %>
+                                        <button type="button" class="btn btn-danger btn-sm"  onclick="updateStatus('<%= d.id %>', 'false')">Deactivate</button>
+                                        <% } else { %>
+                                        <button type="button" class="btn btn-success btn-sm" onclick="updateStatus('<%= d.id %>', 'true')">Activate</button>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                                <% }%>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
+<!-- Modal -->
+<div id="addSubAdmin" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Create New Package</h4>
+            </div>
+            <div class="modal-body">
+                <form method="POST" name="frmPackage" id="frmPackage">
+                    <div class="form-group">
+                        <label for="name">Boot Amount</label>
+                        <input type="text" class="form-control" id="boot_amount" name="boot_amount" placeholder="Enter Boot Amount" data-validation="required number">
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-info" id="btnSubmit">Submit</button>
+                    <h4 id="loaderbtn1" style="display: none"><i class="fa fa-spinner fa-spin" style="color: #000"></i>
+                        Loading</h4>
+                    </div>
+                    
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+<%- include footer %>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/jquery.form-validator.min.js"></script>
+<script>
+    $(document).ready(function (e) {
+        $.validate({
+            modules: 'html5, security'
+        });
+
+        $('.time_formateDateandTime2').each(function() {
+            let dat = formateDateandTime(parseInt($(this).text()));
+            $(this).text(dat);
+        });
+        function formateDateandTime(date) {
+        // 7/12/2018 12:25PM
+
+        if (!isNaN(date)) console.log('DATA', date);
+        var dat = new Date(parseInt(date));
+        console.log('DATA After', dat);
+        var mon = dat.getMonth() + 1 > 9 ? dat.getMonth() + 1 : '0' + parseInt(dat.getMonth() + parseInt(1));
+
+        var hours = dat.getHours() % 12;
+        hours = hours > 9 ? hours : '0' + hours;
+
+        var minutes = dat.getMinutes();
+        minutes = minutes > 9 ? minutes : '0' + minutes;
+
+        var ap = dat.getHours() >= 12 ? 'PM' : 'AM';
+        var day = dat.getDate() > 9 ? dat.getDate() : '0' + dat.getDate();
+
+        rez = day + '/' + mon + '/' + dat.getFullYear() + ' ' + hours + ':' + minutes + ap;
+
+        return rez;
+    }
+        $('#packageTab').DataTable({
+            "aaSorting": []
+        });
+
+
+        $('#frmPackage').on('submit', function (e) {
+            $("#btnSubmit").hide();
+            $("#loaderbtn1").show();
+            e.preventDefault();
+            var formdata = $("#frmPackage").serializeArray();
+            swal({
+                text: 'Please enter your PASSWORD to proceed',
+                content: {
+                    element: "input",
+                    attributes: {
+                    placeholder: "Type your password",
+                    type: "password",
+                    },
+                },
+                button: {
+                    text: "Proceed",
+                    closeModal: false
+                },
+            }).then(password => {
+                if (!password) {
+                    $("#btnSubmit").show();
+                    $("#loaderbtn1").hide();        
+                };
+
+                formdata.push(
+                    {name: 'password', value: password}
+                );
+
+                $.ajax({
+                    method: 'post',
+                    url: '/package/add',
+                    data: formdata,
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.status == 1) {
+                            console.log(response);
+                            swal({
+                                icon: 'success',
+                                title: response.message
+                            }).then(function () {
+                                window.location.reload();
+                            });
+                            $("#btnSubmit").show();
+                            $("#loaderbtn1").hide();
+                        } else {
+                            console.log(response);
+                            swal({
+                                icon: 'error',
+                                title: response.message,
+                            }).then(function () {
+                                window.location.reload();
+                            });
+                            $("#btnSubmit").show();
+                            $("#loaderbtn1").hide();
+                        }
+                    }
+                });
+            }).catch(err => {
+                if (err) {
+                    swal("Oh noes!", "The request failed!", "error");
+                } else {
+                    swal.stopLoading();
+                    swal.close();
+                }
+            });              
+
+        });
+    });
+
+    function updateStatus(id, status) {
+        swal({
+            text: 'Please enter your PASSWORD to proceed',
+            content: {
+                element: "input",
+                attributes: {
+                placeholder: "Type your password",
+                type: "password",
+                },
+            },
+            button: {
+                text: "Proceed",
+                closeModal: false
+            },
+        }).then(password => {
+                if (!password) throw null;
+                $.ajax({
+                method: 'post',
+                url: '/package/update',
+                data: {
+                    request_id: id,
+                    status: status, 
+                    password: password
+                },
+                success: function(response) {
+                    if (response.status == 1) {
+                        swal({
+                            icon: 'success',
+                            title: response.message
+                        }).then(function() {
+                            window.location.reload();
+                        });
+                    } else {
+                        swal({
+                            icon: 'error',
+                            title: response.message
+                        });
+                    }
+                },
+                error: function(response) {
+                    swal({
+                        icon: 'error',
+                        title: response.message
+                    });
+                }
+            });
+        }).catch(err => {
+            if (err) {
+                swal("Oh noes!", "The request failed!", "error");
+            } else {
+                swal.stopLoading();
+                swal.close();
+            }
+        });
+    }
+
+    // function updateStatus(id, status) {
+    //     $.ajax({
+    //         method: 'post',
+    //         url: '/package/update',
+    //         data: {
+    //             request_id: id,
+    //             status: status
+    //         },
+    //         success: function(response) {
+    //             if (response.status == 1) {
+    //                 swal({
+    //                     icon: 'success',
+    //                     title: response.message
+    //                 }).then(function() {
+    //                     window.location.reload();
+    //                 });
+    //             } else {
+    //                 swal({
+    //                     icon: 'error',
+    //                     title: response.message
+    //                 });
+    //             }
+    //         },
+    //         error: function(response) {
+    //             swal({
+    //                 icon: 'error',
+    //                 title: response.message
+    //             });
+    //         }
+    //     });
+    // }
+
+</script>

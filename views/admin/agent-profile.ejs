@@ -1,0 +1,599 @@
+<%- include header %>
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            <%= title %>
+        </h1>
+    </section>
+
+    <!-- Main content -->
+    <section class="content container-fluid">
+        <div class="row">
+            <div class="col-md-3">
+
+                <!-- Profile Image -->
+                <div class="box box-primary">
+                    <div class="box-body box-profile">
+                        <h3 class="profile-username text-center"><%- data.name %></h3>
+                        <p class="text-muted text-center">Username: <%- data.username %></p>
+                        <p class="text-muted text-center">Email: <%- data.email %></p>
+
+                        <ul class="list-group list-group-unbordered">
+                            <li class="list-group-item">
+                                <b>Mobile</b>
+                                <a class="pull-right"><%= data.mobile %></a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Status</b>
+                                <% if ( data.is_active ) { %>
+                                <small class="label bg-green pull-right">Active</small>
+                                <% } else { %>
+                                <small class="label bg-red pull-right">Inactive</small>
+                                <% } %>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Main Wallet</b> <a class="pull-right"><%= data.m_wallet %></a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Commission Wallet</b> <a class="pull-right"><%= data.c_wallet %></a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Commission Rate (%)</b> <a class="pull-right"><%= data.c_rate %></a>
+                            </li>
+                        </ul>
+                        <button type="button" class="btn btn-warning btn-block" data-toggle="modal" data-target="#addCoin">Add Coins</button>
+                        <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#withdrawCoin">Withdraw Coins</button>
+                        <button type="button" class="btn btn-info btn-block" data-toggle="modal" data-target="#setCommission">Set Commission</button> 
+                        <% if ( data.is_active ) { %>
+                        <button type="button" class="btn btn-danger btn-block" onclick="updateStatus('<%= data.id %>', 'false')">Deactivate</button>
+                        <% } else { %>
+                        <button type="button" class="btn btn-success btn-block" onclick="updateStatus('<%= data.id %>', 'true')">Activate</button>
+                        <% } %>
+                        <button type="button" class="btn btn-success btn-block" data-toggle="modal"
+                            data-target="#resetPassword">Password Reset</button>   
+                        </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+
+            </div>
+
+            <div class="col-md-9">
+                <div class="box">
+                    <!-- /.box-header -->
+                    <div class="box-header with-border">
+                        <h3 class="box-title"><%=data.name%>'s Users </h3>
+                    </div>
+                    <div class="box-body table-responsive">
+                        <table id="agetTable" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Username</th>
+                                    <th>Main Wallet</th>
+                                    <th>Commission Wallet</th>
+                                    <th>Join Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                    <% for (d of agents_user) {%>
+                                    <tr class="gradeX">
+                                        <td><%= d.name %></td>
+                                        <td><%= d.username %></td>
+                                        <td><%=d.m_wallet%></td>
+                                        <td><%=d.c_wallet%></td>
+                                        <td class="time_formateDateandTime2"><%= d.created_at%></td>
+                                    </tr>
+                                    <% }%>     
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-danger">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Coin Transaction History</h3>
+                            </div>
+                            <div class="box-body table-responsive">
+                                <table id="historyTable" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Amount</th>
+                                            <th>Txn Type</th>
+                                            <th>Main Wallet</th>
+                                            <th>Commission Wallet</th>
+                                            <th>Date</th>
+                                            <th>Status</th>
+                                            <th>Txn Mode</th>
+                                            <th>Remark</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% for (d of txn.list) {%>
+                                        <tr class="gradeX">
+                                            <td><%= d.txn_amount %></td>
+                                            <td>
+                                                <% if ( d.transaction_type == 'C' ) { %>
+                                                <small class="label bg-green">Credit</small>
+                                                <% } else { %>
+                                                <small class="label bg-red">Debit</small>
+                                                <% } %>
+                                            </td>
+                                            <td><%=d.main_wallet%></td>
+                                            <td><%=d.commission_wallet%></td>
+                                            <td class="time_formateDateandTime2"><%= d.created_at%></td>
+                                            <td class="actions">
+                                                <% if ( d.is_status == 'S' ) { %>
+                                                <small class="label bg-green">Success</small>
+                                                <% } else { %>
+                                                <small class="label bg-red">Failed</small>
+                                                <% } %>
+                                            </td>
+                                            <td><%=d.txn_mode%></td>
+                                            <td><%=d.remark%></td>
+                                        </tr>
+                                        <% }%>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+    <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
+
+<!-- Modal Password Reset -->
+<div id="resetPassword" class="modal fade remark" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Password Reset</h4>
+            </div>
+            <div class="modal-body">
+                <form method="post" id="frmresetPassword" name="frmresetPassword">
+                    <div class="form-group">
+                        <label for="new_pass">New Password <small></label>
+                        <input type="text" class="form-control" id="new_pass" name="pass_confirmation" data-validation="length" data-validation-length="min8">
+                        <input type="hidden" value="<%=data.id%>" name="id">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm_pass">Confirm Password <small></label>
+                        <input type="text" class="form-control" id="confirm_pass" name="pass" data-validation="confirmation">
+                    </div>
+                    <button type="submit" class="btn btn-info" id="btnReset">Submit</button>
+                    <h4 id="loaderReset" style="display: none"><i class="fa fa-spinner fa-spin" style="color: #000"></i>
+                        Loading</h4>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="setCommission" class="modal fade remark" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Set Commission</h4>
+            </div>
+            <div class="modal-body">
+                <form method="post" id="frmSetCommission" name="frmSetCommission">
+                    <div class="form-group">
+                        <label for="commission">Commission Rate <small></label>
+                        <input type="text" class="form-control" id="commission" name="commission" data-validation="number" data-validation-allowing="float">
+                        <input type="hidden" value="<%=data.id%>" name="id">
+                    </div>
+                    <button type="submit" class="btn btn-info" id="btnSetCommission">Submit</button>
+                    <h4 id="loaderbtn1" style="display: none"><i class="fa fa-spinner fa-spin" style="color: #000"></i>
+                        Loading</h4>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal Add Coin -->
+<div id="addCoin" class="modal fade remark" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Add Coin</h4>
+            </div>
+            <div class="modal-body">
+                <form method="post" id="frmAddCoin" name="frmAddCoin">
+                    <div class="form-group">
+                        <label for="wallet">Select Wallet</label>
+                        <select name="wallet" id="wallet" class="form-control" data-validation="required">
+                            <option value="M">Main Wallet</option>
+                            <option value="C">Commission Wallet</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="coin">Number Of Coin <small></label>
+                        <input type="text" class="form-control" id="coin" name="coin" data-validation="number">
+                        <input type="hidden" value="<%=data.id%>" name="id">
+                    </div>
+                    <button type="submit" class="btn btn-info" id="btnAddCoin">Submit</button>
+                    <h4 id="loaderbtn2" style="display: none"><i class="fa fa-spinner fa-spin" style="color: #000"></i>
+                        Loading</h4>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal Withdraw Coin -->
+<div id="withdrawCoin" class="modal fade remark" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Add Coin <small>(Withdraw only possible from Commission Wallet)</small></h4>
+            </div>
+            <div class="modal-body">
+                <form method="post" id="frmwithdrawCoin" name="frmwithdrawCoin">
+                    <div class="form-group">
+                        <label for="wallet">Select Wallet</label>
+                        <select name="wallet" id="wallet" class="form-control" data-validation="required">
+                            <option value="M">Main Wallet</option>
+                            <option value="C">Commission Wallet</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="coin">Number Of Coin <small></label>
+                        <input type="text" class="form-control" id="coin" name="coin" data-validation="number">
+                        <input type="hidden" value="<%=data.id%>" name="id">
+                    </div>
+                    <button type="submit" class="btn btn-info" id="btnRemoveCoin">Submit</button>
+                    <h4 id="loaderbtn3" style="display: none"><i class="fa fa-spinner fa-spin" style="color: #000"></i>
+                        Loading</h4>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<%- include footer %>
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/jquery.form-validator.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $.validate({
+            modules: 'html5, security'
+        });
+
+        $('.time_formateDateandTime2').each(function() {
+            let dat = formateDateandTime(parseInt($(this).text()));
+            $(this).text(dat);
+        });
+        function formateDateandTime(date) {
+        // 7/12/2018 12:25PM
+
+        if (!isNaN(date)) console.log('DATA', date);
+        var dat = new Date(parseInt(date));
+        console.log('DATA After', dat);
+        var mon = dat.getMonth() + 1 > 9 ? dat.getMonth() + 1 : '0' + parseInt(dat.getMonth() + parseInt(1));
+
+        var hours = dat.getHours() % 12;
+        hours = hours > 9 ? hours : '0' + hours;
+
+        var minutes = dat.getMinutes();
+        minutes = minutes > 9 ? minutes : '0' + minutes;
+
+        var ap = dat.getHours() >= 12 ? 'PM' : 'AM';
+        var day = dat.getDate() > 9 ? dat.getDate() : '0' + dat.getDate();
+
+        rez = day + '/' + mon + '/' + dat.getFullYear() + ' ' + hours + ':' + minutes + ap;
+
+        return rez;
+    }
+
+        $('#agetTable').DataTable({
+             "aaSorting": []
+        });
+
+        $('#historyTable').DataTable({
+             "aaSorting": []
+        });
+
+        // Set Commission
+        $('#frmSetCommission').on('submit', function (e) {
+            $("#btnSetCommission").hide();
+            $("#loaderbtn1").show();
+            e.preventDefault();
+            var formdata = $("#frmSetCommission").serializeArray();
+            swal({
+                text: 'Please enter your PASSWORD to proceed',
+                content: {
+                    element: "input",
+                    attributes: {
+                    placeholder: "Type your password",
+                    type: "password",
+                    },
+                },
+                button: {
+                    text: "Proceed",
+                    closeModal: false
+                },
+            }).then(password => {
+                if (!password) {
+                    $("#btnSetCommission").show();
+                    $("#loaderbtn1").hide();        
+                };
+
+                formdata.push(
+                    {name: 'password', value: password}
+                );
+                $.ajax({
+                    method: 'post',
+                    url: '/agent/set-commission',
+                    data: formdata,
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.status == 1) {
+                            console.log(response);
+                            swal({
+                                icon: 'success',
+                                title: response.message
+                            }).then(function () {
+                                window.location.reload();
+                            });
+                            $("#btnSetCommission").show();
+                            $("#loaderbtn1").hide();
+                        } else {
+                            console.log(response);
+                            swal({
+                                icon: 'error',
+                                title: response.message,
+                            }).then(function () {
+                                window.location.reload();
+                            });
+                            $("#btnSetCommission").show();
+                            $("#loaderbtn1").hide();
+                        }
+                    }
+                });
+            }).catch(err => {
+                if (err) {
+                    swal("Oh noes!", "The request failed!", "error");
+                } else {
+                    swal.stopLoading();
+                    swal.close();
+                }
+            });        
+
+        });
+
+        // Add Coin
+        $('#frmAddCoin').on('submit', function (e) {
+            $("#btnAddCoin").hide();
+            $("#loaderbtn2").show();
+            e.preventDefault();
+            var formdata = $("#frmAddCoin").serializeArray();
+            swal({
+                text: 'Please enter your PASSWORD to proceed',
+                content: {
+                    element: "input",
+                    attributes: {
+                    placeholder: "Type your password",
+                    type: "password",
+                    },
+                },
+                button: {
+                    text: "Proceed",
+                    closeModal: false
+                },
+            }).then(password => {
+                if (!password) {
+                    $("#btnAddCoin").show();
+                    $("#loaderbtn2").hide();        
+                };
+
+                formdata.push(
+                    {name: 'password', value: password}
+                );
+
+                $.ajax({
+                    method: 'post',
+                    url: '/agent/add-coin',
+                    data: formdata,
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.status == 1) {
+                            console.log(response);
+                            swal({
+                                icon: 'success',
+                                title: response.message
+                            }).then(function () {
+                                window.location.reload();
+                            });
+                            $("#btnAddCoin").show();
+                            $("#loaderbtn2").hide();
+                        } else {
+                            console.log(response);
+                            swal({
+                                icon: 'error',
+                                title: response.message,
+                            }).then(function () {
+                                window.location.reload();
+                            });
+                            $("#btnAddCoin").show();
+                            $("#loaderbtn2").hide();
+                        }
+                    }
+                });
+            }).catch(err => {
+                if (err) {
+                    swal("Oh noes!", "The request failed!", "error");
+                } else {
+                    swal.stopLoading();
+                    swal.close();
+                }
+            });              
+
+        });
+
+        // Withdraw Coin
+        $('#frmwithdrawCoin').on('submit', function (e) {
+            $("#btnRemoveCoin").hide();
+            $("#loaderbtn3").show();
+            e.preventDefault();
+            var formdata = $("#frmwithdrawCoin").serializeArray();
+            swal({
+                text: 'Please enter your PASSWORD to proceed',
+                content: {
+                    element: "input",
+                    attributes: {
+                    placeholder: "Type your password",
+                    type: "password",
+                    },
+                },
+                button: {
+                    text: "Proceed",
+                    closeModal: false
+                },
+            }).then(password => {
+                if (!password) {
+                    $("#btnAddCoin").show();
+                    $("#loaderbtn2").hide();        
+                };
+
+                formdata.push(
+                    {name: 'password', value: password}
+                );
+
+                $.ajax({
+                    method: 'post',
+                    url: '/agent/withdraw-coin',
+                    data: formdata,
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.status == 1) {
+                            console.log(response);
+                            swal({
+                                icon: 'success',
+                                title: response.message
+                            }).then(function () {
+                                window.location.reload();
+                            });
+                            $("#btnRemoveCoin").show();
+                            $("#loaderbtn3").hide();
+                        } else {
+                            console.log(response);
+                            swal({
+                                icon: 'error',
+                                title: response.message,
+                            }).then(function () {
+                                window.location.reload();
+                            });
+                            $("#btnRemoveCoin").show();
+                            $("#loaderbtn3").hide();
+                        }
+                    }
+                });
+            }).catch(err => {
+                if (err) {
+                    swal("Oh noes!", "The request failed!", "error");
+                } else {
+                    swal.stopLoading();
+                    swal.close();
+                }
+            });            
+
+        });
+
+
+    });
+
+    function updateStatus(id, status) {
+        swal({
+            text: 'Please enter your PASSWORD to proceed',
+            content: {
+                element: "input",
+                attributes: {
+                placeholder: "Type your password",
+                type: "password",
+                },
+            },
+            button: {
+                text: "Proceed",
+                closeModal: false
+            },
+        }).then(password => {
+                if (!password) throw null;
+                $.ajax({
+                method: 'post',
+                url: '/agent/update',
+                data: {
+                    request_id: id,
+                    status: status, 
+                    password: password
+                },
+                success: function(response) {
+                    if (response.status == 1) {
+                        swal({
+                            icon: 'success',
+                            title: response.message
+                        }).then(function() {
+                            window.location.reload();
+                        });
+                    } else {
+                        swal({
+                            icon: 'error',
+                            title: response.message
+                        });
+                    }
+                },
+                error: function(response) {
+                    swal({
+                        icon: 'error',
+                        title: response.message
+                    });
+                }
+            });
+        }).catch(err => {
+            if (err) {
+                swal("Oh noes!", "The request failed!", "error");
+            } else {
+                swal.stopLoading();
+                swal.close();
+            }
+        });
+    }
+
+    
+</script>

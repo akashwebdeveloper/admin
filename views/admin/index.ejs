@@ -1,0 +1,94 @@
+<%- include header %>
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            <%= title %>
+        </h1>
+    </section>
+
+    <!-- Main content -->
+    <section class="content container-fluid">
+        <!-- Info boxes -->
+        <div class="row">
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="info-box">
+                    <span class="info-box-icon bg-yellow"><i class="ion ion-ios-people-outline"></i></span>
+
+                    <div class="info-box-content">
+                        <span class="info-box-text">All User</span>
+                        <span class="info-box-number"><%=data.sub_admin%></span>
+                    </div>
+                    <!-- /.info-box-content -->
+                </div>
+                <!-- /.info-box -->
+            </div>
+            <!-- /.col -->
+
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="info-box">
+                    <span class="info-box-icon bg-blue"><i class="fa fa-user-secret"></i></span>
+
+                    <div class="info-box-content">
+                        <span class="info-box-text">All Sub Admin</span>
+                        <span class="info-box-number"><%=data.sub_admin%></span>
+                    </div>
+                    <!-- /.info-box-content -->
+                </div>
+                <!-- /.info-box -->
+            </div>
+            <!-- /.col -->
+
+            <!-- fix for small devices only -->
+            <div class="clearfix visible-sm-block"></div>
+
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="info-box">
+                    <span class="info-box-icon bg-purple"><i class="fa fa-user-plus"></i></span>
+
+                    <div class="info-box-content">
+                        <span class="info-box-text">All Agent</span>
+                        <span class="info-box-number"><%=data.agent%></span>
+                    </div>
+                    <!-- /.info-box-content -->
+                </div>
+                <!-- /.info-box -->
+            </div>
+            <!-- /.col -->
+
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="info-box">
+                    <span class="info-box-icon bg-aqua"><i class="fa fa-gamepad"></i></span>
+
+                    <div class="info-box-content">
+                        <span class="info-box-text">All Game</span>
+                        <span class="info-box-number">0</span>
+                    </div>
+                    <!-- /.info-box-content -->
+                </div>
+                <!-- /.info-box -->
+            </div>
+            <!-- /.col -->
+
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="info-box">
+                    <span class="info-box-icon bg-red"><i class="fa fa-money"></i></span>
+
+                    <div class="info-box-content">
+                        <span class="info-box-text">Admin Commission</span>
+                        <span class="info-box-number">0</span>
+                    </div>
+                    <!-- /.info-box-content -->
+                </div>
+                <!-- /.info-box -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+
+    </section>
+    <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
+<%- include footer %>

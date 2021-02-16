@@ -1,0 +1,190 @@
+<%- include header %>
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            <%= title %>
+        </h1>
+    </section>
+
+    <!-- Main content -->
+    <section class="content container-fluid">
+        <div class="row">
+
+            <div class="col-md-6">
+                <div class="box box-danger">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Special Note For Users</h3>
+                    </div>
+                    <!-- /.box-header -->
+                    <!-- form start -->
+                    <form role="form" method="POST" name="setMsgFrm" id="setMsgFrm">
+                        <div class="box-body">
+                            <div class="form-group">
+                                <label for="msg">Message</label>
+                                <textarea name="msg" id="" cols="20" rows="5" class="form-control" data-validation="required"><%= data.message_from_admin%></textarea>
+                            </div>
+                            <div class="form-group">
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="msgStatus" id="msgStatus1" value="Y" <%- (data.is_admin_msg_active== 'Y') ?  "checked" : "" ; %> >
+                                        Show message to users
+                                    </label>
+                                </div>
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="msgStatus" id="msgStatus2" value="N" <%- (data.is_admin_msg_active== 'N') ?  "checked" : "" ; %>>
+                                        Don't show message to users
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.box-body -->
+
+                        <div class="box-footer">
+                            <button type="submit" class="btn btn-info" id="btnRemoveCoin">Submit</button>
+                            <h4 id="loaderbtn3" style="display: none"><i class="fa fa-spinner fa-spin" style="color: #000"></i>
+                                Loading</h4>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="box box-danger">
+                    <div class="box-body">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th>Game Version</th>
+                                <td><%= data.version%></td>
+                            </tr>
+                            <tr>
+                                <th>Maintenance Mode Aactive?</th>
+                                <td>
+                                    <% if ( data.is_maintenance == 'Y' ) { %>
+                                    <button type="button" class="btn btn-success"
+                                        onclick="changeGameMode('N')">YES</button>
+                                    <% } else { %>
+                                    <button type="button" class="btn btn-danger"
+                                        onclick="changeGameMode('Y')">NO</button>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+    <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
+<%- include footer %>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-form-validator/2.3.26/jquery.form-validator.min.js"></script>
+<script>
+    function changeGameMode(type) {
+        $.ajax({
+            method: 'post',
+            url: '/admin/maintenance-status',
+            data: {
+                'status': type
+            },
+            success: function (response) {
+                if (response.status == 1) {
+                    console.log(response);
+                    swal({
+                        icon: 'success',
+                        title: response.message
+                    }).then(function () {
+                        window.location.reload();
+                    });
+                } else {
+                    console.log(response);
+                    swal({
+                        icon: 'error',
+                        title: response.message,
+                    }).then(function () {
+                        window.location.reload();
+                    });
+                }
+            }
+        });
+    }
+    
+    $(document).ready(function () {
+        $.validate({
+            modules: 'html5, security'
+        });
+    // Set Msg
+    $('#setMsgFrm').on('submit', function (e) {
+        $("#btnRemoveCoin").hide();
+        $("#loaderbtn3").show();
+        e.preventDefault();
+        var formdata = $("#setMsgFrm").serializeArray();
+        swal({
+            text: 'Please enter your PASSWORD to proceed',
+            content: {
+                element: "input",
+                attributes: {
+                    placeholder: "Type your password",
+                    type: "password",
+                },
+            },
+            button: {
+                text: "Proceed",
+                closeModal: false
+            },
+        }).then(password => {
+            if (!password) {
+                $("#btnRemoveCoin").show();
+                $("#loaderbtn3").hide();
+            };
+
+            formdata.push({
+                name: 'password',
+                value: password
+            });
+
+            $.ajax({
+                method: 'post',
+                url: '/admin/set-msg',
+                data: formdata,
+                dataType: 'json',
+                success: function (response) {
+                    if (response.status == 1) {
+                        console.log(response);
+                        swal({
+                            icon: 'success',
+                            title: response.message
+                        }).then(function () {
+                            window.location.reload();
+                        });
+                        $("#btnRemoveCoin").show();
+                        $("#loaderbtn3").hide();
+                    } else {
+                        console.log(response);
+                        swal({
+                            icon: 'error',
+                            title: response.message,
+                        }).then(function () {
+                            window.location.reload();
+                        });
+                        $("#btnRemoveCoin").show();
+                        $("#loaderbtn3").hide();
+                    }
+                }
+            });
+        }).catch(err => {
+            if (err) {
+                swal("Oh noes!", "The request failed!", "error");
+            } else {
+                swal.stopLoading();
+                swal.close();
+            }
+        });
+
+    });
+});
+</script>

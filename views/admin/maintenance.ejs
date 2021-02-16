@@ -1,0 +1,70 @@
+<%- include header %>
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            <%= title %>
+        </h1>
+    </section>
+
+    <!-- Main content -->
+    <section class="content container-fluid">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="box box-danger">
+                    <div class="box-body">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th>Game Version</th>
+                                <td><%= data.value%></td>
+                            </tr>
+                            <tr>
+                                <th>Maintenance Mode:</th>
+                                <td>
+                                    <% if ( data.undermaintenance == 'Y' ) { %>
+                                    <button type="button" class="btn btn-success" onclick="changeGameMode('N')">YES</button>
+                                    <% } else { %>
+                                    <button type="button" class="btn btn-danger" onclick="changeGameMode('Y')">NO</button>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
+<%- include footer %>
+
+<script>
+function changeGameMode(type) {
+    $.ajax({
+        method: 'post',
+        url: '/admin/change_game_status',
+        data: {'status': type},
+        success: function (response) {
+            if (response.status == 1) {
+                console.log(response);
+                swal({
+                icon: 'success',
+                title: response.Msg
+                }).then(function(){
+                window.location.reload();
+                });
+            } else {
+                console.log(response);
+                swal({
+                icon: 'error',
+                title: response.Msg,
+                }).then(function(){
+                window.location.reload();
+                });
+            }
+        }
+    });
+}
+</script>
